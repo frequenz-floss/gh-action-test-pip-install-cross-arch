@@ -1,0 +1,10 @@
+#!/bin/sh
+# License: MIT
+# Copyright © 2024 Frequenz Energy-as-a-Service GmbH
+set -eu
+
+echo "Wheels dir: $WHEELS_DIR"
+
+python -m pip install "$WHEELS_DIR"/*.whl
+echo "Installed packages:"
+pip freeze
