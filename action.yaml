@@ -1,0 +1,66 @@
+name: "Test pip install (cross-arch)"
+description: "Test installing the wheel package using pip in a particular architecture."
+author: "Frequenz Energy-as-a-Service GmbH"
+
+# Refer to the following link(s) for more information on inputs:
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#inputs
+inputs:
+  wheels_dir:
+    description: >
+      The directory containing the wheel files to install. All files with
+      a `.whl` suffix will be installed.
+
+      Due to the limitations of the `frequenz-floss/gh-action-run-python-in-qemu`
+      action, the directory must not contain spaces or other special characters
+      interpreted by the shell.
+    required: false
+    default: "dist"
+  architecture:
+    description: >
+      The architecture to build the Docker image for example, `arm`, `arm64`,
+      etc.
+
+      Passed to the `frequenz-floss/gh-action-run-python-in-qemu` action,
+      please consult the action for more details.
+    required: true
+  python_version:
+    description: >
+      The Python version to use, for example `3.11`, `3.12`, etc.
+
+      Passed to the `frequenz-floss/gh-action-run-python-in-qemu` action,
+      please consult the action for more details.
+    required: true
+    default: ""
+  ubuntu_version:
+    description: >
+      The Ubuntu version to use, for example `20.04`, `22.04`, etc. Required
+      unless `dockerfile` is provided.
+
+      Passed to the `frequenz-floss/gh-action-run-python-in-qemu` action,
+      please consult the action for more details.
+    required: false
+    default: ""
+  dockerfile:
+    description: >
+      The Dockerfile to use to build the Docker image.
+
+      Passed to the `frequenz-floss/gh-action-run-python-in-qemu` action,
+      please consult the action for more details.
+    required: false
+    default: ""
+
+
+# Refer to the following link(s) for more information on the composite run steps:
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#runs
+runs:
+  using: "composite"
+  steps:
+    - name: Install wheels in QEMU
+      uses: frequenz-floss/gh-action-run-python-in-qemu@v0.x.x
+      with:
+        script: "${{ github.action_path }}/pip-install"
+        pass_env: "WHEELS_DIR=${{ inputs.wheels_dir }}"
+        architecture: ${{ matrix.architecture }}
+        ubuntu_version: ${{ inputs.ubuntu_version }}
+        python_version: ${{ inputs.python_version }}
+        dockerfile: ${{ inputs.dockerfile }}
